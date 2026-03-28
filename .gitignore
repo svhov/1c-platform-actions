@@ -1,0 +1,4 @@
+.1c-devbase.ps1
+*.log
+build/
+.claude/
