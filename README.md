@@ -1,67 +1,81 @@
-# 1c-batch
+# 🚀 1c-actions
 
-Набор PowerShell-скриптов для пакетных операций с платформой 1С:Предприятие 8 через Claude Code (slash command / MCP skill).
+**Научи Claude Code работать с 1С:Предприятие!**
 
-Позволяет AI-ассистенту Claude Code выполнять типовые операции с базой 1С в пакетном режиме: собирать и разбирать внешние обработки, загружать и выгружать конфигурации и расширения, запускать предприятие и конфигуратор.
+Набор PowerShell-скриптов, который превращает Claude Code в полноценного помощника разработчика 1С. Сборка, разборка, деплой, линтинг — всё через AI-ассистента, одной командой.
 
-## Возможности
+---
 
-- **build-epf** — сборка внешней обработки/отчёта (.epf/.erf) из XML
-- **dump-epf** — разборка обработки/отчёта в XML
-- **load-config** — загрузка конфигурации из XML в базу (полная/частичная)
-- **dump-config** — выгрузка конфигурации из базы в XML (полная/инкрементальная)
-- **load-extension** — загрузка расширения из XML в базу
-- **dump-extension** — выгрузка расширения из базы в XML
-- **run-enterprise** — запуск 1С:Предприятие
-- **run-designer** — запуск Конфигуратора
+## ✨ Что умеет
 
-## Требования
+| | Действие | Скрипт |
+|---|---|---|
+| 🔨 | Собрать обработку/отчёт (.epf/.erf) из XML | `build-epf.ps1` |
+| 📦 | Разобрать обработку/отчёт в XML | `dump-epf.ps1` |
+| 🏗️ | Собрать файл конфигурации (.cf) | `build-cf.ps1` |
+| 🧩 | Собрать файл расширения (.cfe) | `build-cfe.ps1` |
+| ⬆️ | Загрузить конфигурацию из XML в базу | `load-config.ps1` |
+| ⬇️ | Выгрузить конфигурацию из базы в XML | `dump-config.ps1` |
+| 📥 | Загрузить расширение в базу | `load-extension.ps1` |
+| 📤 | Выгрузить расширение из базы | `dump-extension.ps1` |
+| 🔍 | Проверить BSL-код линтером | `bsl-lint.ps1` |
+| ▶️ | Запустить 1С:Предприятие | `run-enterprise.ps1` |
+| ⚙️ | Запустить Конфигуратор | `run-designer.ps1` |
 
-- Windows 10+
-- PowerShell 5.1+
-- Платформа 1С:Предприятие 8.3 (путь к `1cv8.exe` задаётся в конфиге)
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+---
 
-## Установка
+## 🎯 Зачем это нужно
 
-### Как slash command в Claude Code
+> «Клод, разбери обработку, исправь баг в модуле формы и собери обратно»
 
-Скопируйте содержимое репозитория в `.claude/commands/1c-batch/` вашего проекта:
+Без 1c-actions Claude Code не знает, как взаимодействовать с платформой 1С. С ним — может:
+
+- 🛠️ **Собирать и разбирать** обработки, конфигурации, расширения
+- 📝 **Редактировать BSL-код** и сразу проверять его линтером
+- 🚀 **Деплоить** — собрать CF/CFE из исходников для переноса на прод
+- 🔄 **Полный цикл разработки** — выгрузить → изменить → проверить → загрузить
+
+---
+
+## ⚡ Быстрый старт
+
+### 1. Скопируйте в свой проект
 
 ```
 your-project/
 ├── .claude/
 │   └── commands/
-│       └── 1c-batch/
-│           ├── SKILL.md          # описание команды для Claude
+│       └── 1c-actions/
+│           ├── SKILL.md
 │           └── scripts/
 │               ├── 1c-common.ps1
 │               ├── build-epf.ps1
 │               ├── dump-epf.ps1
+│               ├── build-cf.ps1
+│               ├── build-cfe.ps1
 │               ├── load-config.ps1
 │               ├── dump-config.ps1
 │               ├── load-extension.ps1
 │               ├── dump-extension.ps1
+│               ├── bsl-lint.ps1
 │               ├── run-enterprise.ps1
 │               └── run-designer.ps1
-├── .1c-devbase.ps1               # настройки подключения к базе
+├── .1c-devbase.ps1
 └── ...
 ```
 
-После этого в Claude Code станет доступна команда `/1c-batch`.
+### 2. Настройте подключение к базе
 
-## Настройка подключения
-
-Создайте файл `.1c-devbase.ps1` в корне проекта:
+Создайте `.1c-devbase.ps1` в корне проекта:
 
 ```powershell
 # Путь к платформе
 $Global:OneCPlatform = "C:\Program Files\1cv8\8.3.25.1257\bin\1cv8.exe"
 
-# Вариант 1: файловая база
+# Файловая база
 $Global:OneCBasePath = "C:\Users\user\bases\my-base"
 
-# Вариант 2: серверная база
+# ...или серверная
 # $Global:OneCServer = "server-name"
 # $Global:OneCBase   = "base-name"
 
@@ -70,71 +84,116 @@ $Global:OneCBasePath = "C:\Users\user\bases\my-base"
 # $Global:OneCPassword = "password"
 ```
 
-> Добавьте `.1c-devbase.ps1` в `.gitignore` — файл содержит локальные настройки.
+> ⚠️ Добавьте `.1c-devbase.ps1` в `.gitignore` — файл содержит локальные настройки!
 
-## Примеры использования
+### 3. Готово! 🎉
 
-### Разобрать обработку, исправить код, собрать обратно
+В Claude Code теперь доступна команда **`/1c-actions`**. Просто попросите Claude сделать то, что нужно.
+
+---
+
+## 📖 Примеры
+
+### 🛠️ Исправить обработку
 
 ```bash
-# 1. Разборка
-powershell.exe -NoProfile -File .claude/commands/1c-batch/scripts/dump-epf.ps1 \
+# Разобрать
+powershell.exe -NoProfile -File .claude/commands/1c-actions/scripts/dump-epf.ps1 \
   -XmlFile "src/epf/МояОбработка.xml" -EpfFile "D:/Исходная.epf"
 
-# 2. Редактируем BSL-файлы (вручную или через Claude Code)
+# Отредактировать BSL-файлы (Claude сделает это за вас!)
 
-# 3. Сборка
-powershell.exe -NoProfile -File .claude/commands/1c-batch/scripts/build-epf.ps1 \
+# Собрать обратно
+powershell.exe -NoProfile -File .claude/commands/1c-actions/scripts/build-epf.ps1 \
   -XmlFile "src/epf/МояОбработка.xml" -OutputFile "build/МояОбработка.epf"
 
-# 4. Проверка
-powershell.exe -NoProfile -File .claude/commands/1c-batch/scripts/run-enterprise.ps1 \
+# Проверить
+powershell.exe -NoProfile -File .claude/commands/1c-actions/scripts/run-enterprise.ps1 \
   -EpfFile "build/МояОбработка.epf"
 ```
 
-### Обновить расширение
+### 📦 Собрать CF/CFE для деплоя
 
 ```bash
-# Выгрузить (инкрементально)
-powershell.exe -NoProfile -File .claude/commands/1c-batch/scripts/dump-extension.ps1 \
+# Конфигурация
+powershell.exe -NoProfile -File .claude/commands/1c-actions/scripts/build-cf.ps1 \
+  -XmlDir "src/cf" -OutputFile "build/МояКонфигурация.cf"
+
+# Расширение
+powershell.exe -NoProfile -File .claude/commands/1c-actions/scripts/build-cfe.ps1 \
+  -XmlDir "src/ext/АМЕ" -ExtName "АМЕ" -OutputFile "build/АМЕ.cfe"
+```
+
+### 🔍 Проверить код линтером
+
+```bash
+# Быстрая проверка
+powershell.exe -NoProfile -File .claude/commands/1c-actions/scripts/bsl-lint.ps1 \
+  -SrcDir "src/cf"
+
+# С отчётом в JSON
+powershell.exe -NoProfile -File .claude/commands/1c-actions/scripts/bsl-lint.ps1 \
+  -SrcDir "src/cf" -ConfigFile ".bsl-language-server.json" \
+  -Reporter json -OutputFile "build/bsl-report.json"
+```
+
+> 💡 Для линтинга нужен [BSL Language Server](https://github.com/1c-syntax/bsl-language-server) — в PATH или JAR рядом со скриптами.
+
+### 🔄 Обновить расширение
+
+```bash
+# Выгрузить
+powershell.exe -NoProfile -File .claude/commands/1c-actions/scripts/dump-extension.ps1 \
   -XmlDir "src/ext/МоёРасширение" -ExtName "МоёРасширение" -Update
 
-# Внести изменения в XML/BSL
+# Изменить код
 
 # Загрузить обратно
-powershell.exe -NoProfile -File .claude/commands/1c-batch/scripts/load-extension.ps1 \
+powershell.exe -NoProfile -File .claude/commands/1c-actions/scripts/load-extension.ps1 \
   -XmlDir "src/ext/МоёРасширение" -ExtName "МоёРасширение"
 ```
 
-### Загрузить конфигурацию (частично)
+### ⬆️ Частичная загрузка конфигурации
 
 ```bash
-powershell.exe -NoProfile -File .claude/commands/1c-batch/scripts/load-config.ps1 \
+powershell.exe -NoProfile -File .claude/commands/1c-actions/scripts/load-config.ps1 \
   -XmlDir "src/cf" -Files "CommonModules/МойМодуль/Ext/Module.bsl"
 ```
 
-## Структура скриптов
+---
 
-| Скрипт | Назначение |
-|---|---|
-| `1c-common.ps1` | Общие функции: поиск конфига, формирование аргументов, вызов Designer |
-| `build-epf.ps1` | Сборка EPF/ERF из XML |
-| `dump-epf.ps1` | Разборка EPF/ERF в XML |
-| `load-config.ps1` | Загрузка конфигурации из XML |
-| `dump-config.ps1` | Выгрузка конфигурации в XML |
-| `load-extension.ps1` | Загрузка расширения из XML |
-| `dump-extension.ps1` | Выгрузка расширения в XML |
-| `run-enterprise.ps1` | Запуск 1С:Предприятие |
-| `run-designer.ps1` | Запуск Конфигуратора |
+## 🔧 Требования
 
-## Как это работает
+- Windows 10+
+- PowerShell 5.1+
+- 1С:Предприятие 8.3
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+- [BSL Language Server](https://github.com/1c-syntax/bsl-language-server) *(только для `bsl-lint`)*
+
+---
+
+## 🤔 Как это работает
 
 1. Каждый скрипт подключает `1c-common.ps1` с общими функциями
-2. `Get-1CDevBase` ищет файл `.1c-devbase.ps1` вверх по дереву каталогов от текущей директории
+2. `Get-1CDevBase` ищет `.1c-devbase.ps1` вверх по дереву каталогов
 3. Из конфига берутся путь к платформе, строка подключения и авторизация
-4. Формируется вызов `1cv8.exe DESIGNER /` с нужными параметрами пакетного режима
+4. Формируется вызов `1cv8.exe DESIGNER` с нужными параметрами
 5. При ошибке автоматически выводится лог платформы
 
-## Лицензия
+---
 
-MIT
+## 🤝 Участие в проекте
+
+Нашли баг? Есть идея для нового скрипта? Открывайте [Issue](https://github.com/andrewnomoore/1c-ps1ch/issues) или присылайте Pull Request!
+
+---
+
+## 📄 Лицензия
+
+MIT — используйте свободно в любых проектах.
+
+---
+
+<p align="center">
+  <b>⭐ Поставьте звезду, если проект оказался полезен!</b>
+</p>
